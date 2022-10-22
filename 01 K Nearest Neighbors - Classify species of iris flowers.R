@@ -44,24 +44,23 @@ ggplot(iris, aes(Petal.Width, Sepal.Length)) +
 
 ##################################################.
 # 3 DATA PREPROCESSING - STANDARDIZATION  -----
-
+# Standardization of numerical values of the features.
 # These data require only two preparation steps: . 
 
-# * 3.1 Standardization of numerical values of the features. -----
-# Before standardization
+# Check mean and media Before standardization
 summary(iris[,c('Sepal.Width', 'Sepal.Length', 'Petal.Width', 'Petal.Length')])
 
-# LAPPLY SCALE 
+# LAPPLY SCALE - STANDARDIZE
 iris[,c('Sepal.Width', 'Sepal.Length', 
         'Petal.Width', 'Petal.Length')] <-  
   lapply(iris[,c('Sepal.Width', 'Sepal.Length', 
                  'Petal.Width', 'Petal.Length')], scale)
 summary(iris)
+# Results: Mean is zero, variance is one
 print(sapply(iris[,c('Sepal.Width', 'Sepal.Length', 
                      'Petal.Width', 'Petal.Length')], mean)) # Means ~ Zero
 print(sapply(iris[,c('Sepal.Width', 'Sepal.Length', 
                      'Petal.Width', 'Petal.Length')], sd)) # SD = 1 
-# Results: Mean is zero, variance is one
 
 ################################################.
 # 4 SPLIT TRAIN AND TEST SETS --------
@@ -71,10 +70,10 @@ print(sapply(iris[,c('Sepal.Width', 'Sepal.Length',
 set.seed(2345)
 iris$rows <- as.numeric(rownames(iris)) # use as.numeric because rownames() returns character
 
-# Train Set
+# Train Set 70% of Data
 train.iris <- dplyr::sample_frac(iris, 0.7)     # 70% ~ 105 from 150 rows
 
-# Test Set
+# Test Set 30% of Data
 # test.iris <- dplyr::setdiff(iris,train.iris) #[-train.iris$rows,]
 test.iris <- iris[!iris$rows %in% train.iris$rows,]
 train.iris <- select(train.iris,-"rows") # all except col rows
@@ -92,7 +91,7 @@ table(test.iris$Species)
 # the label and preparation of the data completed you will now train 
 # and evaluate a  K=3  model.
   
-# * 5.1 Defines the model ---- 
+# 5.1 Defines the model with: 
 # Tilda ~ means "modeled by"
 # Model the label Species by ALL FEATURES ("." (dot))
 
@@ -110,6 +109,8 @@ test.iris$predicted <- predict(knn.3)  # Classifies to the most probable Species
 test.iris$correct <- test.iris$Species == test.iris$predicted
 round(100 * sum(test.iris$correct) / nrow(test.iris))
 # accuracy 91%
+
+head(test.iris,5)
 
 # 8 VISUALIZE THE INCORRECT RESULTS ---------
 # Correctly classified cases are shown by triangles and 
