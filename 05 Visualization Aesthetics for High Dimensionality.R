@@ -1,7 +1,7 @@
 #########################################################.
 # DATA EXPLORATORY
-# DISTRIBUTION OF NUMERICAL FEATURES AND LABELS
-# HISTOGRAMS. KDE PLOTS
+# VISUALIZATION 
+# AESTHETICS FOR HIGHER DIMENSIONALITY: MARKER SHAPE, SIZE, COLOR
 # INTRODUCTION TO MACHINE LEARNING - 2017
 # data: Automobile price 
 #########################################################.
@@ -87,75 +87,77 @@ for(col in colnames(auto_prices)){
 }
 
 ###########################################################.
-# 5 VISUALIZATION  ------
+# 6 AESTHETICS ======================================
+# Use aesthetics to add project additional dimensions
 
-# * 5.1 BAR PLOTS - FREQUENCY CHARTS ------
-
-# The bar plot is created using the ggpot2 geom_bar plot type.
-plot_bars <- function(df){
-  # Set the initial plot area dimensions
-  options(repr.plot.width=4, repr.plot.height=3.5) 
-  for(col in colnames(df)){
-      # A filter is applied to find character columns.
-      if(is.character(df[,col])){
-        print(paste0("Bar Plots: ",col))
-      p = ggplot(df, aes_string(col)) + 
-        geom_bar(alpha = 0.6) 
-        theme(axis.text.x = element_text(angle = 120, hjust = 1))
-      print(p)
-    }
-  }
-}
-plot_bars(auto_prices)
-
-# * 5.2 HISTOGRAMS -------
-plot_hist <- function(df, numcols, bins = 10){
-  options(repr.plot.width=4, repr.plot.height=3) # Set the initial plot area dimensions
-  for(col in numcols){
-    if(is.numeric(df[,col])){
-      print(paste0("Histogram: ",col))
-      bw = (max(df[,col]) - min(df[,col]))/(bins + 1)
-      p = ggplot(df, aes_string(col)) + 
-        geom_histogram(alpha = 0.6, binwidth = bw) 
-      print(p)
-    }
+# * 6.1 Marker Shape =============
+# Works well for categorical variables
+plot_scatter_sp <- function(df, cols, col_y = 'price', alpha = 1.0){
+  options(repr.plot.width=5, repr.plot.height=3.5) 
+  for(col in cols){
+    print(paste0("Categorical variable: ",col))
+    p = ggplot(df, aes_string(col, col_y)) + 
+      geom_point(aes(shape = factor(fuel.type)), alpha = alpha) +
+      ggtitle(paste('Scatter plot of', col_y, 'vs.', col, '\n with shape by fuel type'))
+    print(p)
   }
 }
 
-numcols = c('curb.weight', 'engine.size', 'horsepower', 'city.mpg', 'price')
-plot_hist(auto_prices, numcols)
+numcols = c('curb.weight', 'engine.size', 'horsepower', 'city.mpg')#, 'price')
+plot_scatter_sp(auto_prices, numcols, alpha = 0.2)
 
-# * 5.3 KERNEL DENSITY PLOTS -------
-# smoothed version of a histogram
-plot_dist <- function(df, numcols){
-  options(repr.plot.width=4, repr.plot.height=3) # Set the initial plot area dimensions
-  for(col in numcols){
-    if(is.numeric(df[,col])){
-      print(paste0("Kernel Density plot: ",col))
-      p = ggplot(df, aes_string(col)) + 
-        geom_density(color = 'blue') +
-        geom_rug()
-      print(p)
-    }
+# * 6.2 Marker Size ================
+# Works with numerical or categorical ordinal variables
+plot_scatter_sp_sz = function(df, cols, col_y = 'price', alpha = 1.0){
+  options(repr.plot.width=5, repr.plot.height=3.5)
+  df$curb.weight.2 = df$curb.weight**2
+  for(col in cols){
+    print(paste0("Categorical variable: ",col))
+    p = ggplot(df, aes_string(col, col_y)) + 
+      geom_point(aes(shape = factor(fuel.type), size = curb.weight.2), alpha = alpha) +
+      ggtitle(paste('Scatter plot of', col_y, 'vs.', col, '\n with shape by fuel type'))
+    print(p)
   }
 }
 
-plot_dist(auto_prices, numcols)
-
-# * 5.4 COMBINE HISTOGRAMS AND KDES -----
-plot_hist_dens <- function(df, numcols, bins = 10){
-  options(repr.plot.width=4, repr.plot.height=3) # Set the initial plot area dimensions
-  for(col in numcols){
-    if(is.numeric(df[,col])){
-      print(paste0("Hist + KDE:  plot: ",col))
-      bw = (max(df[,col]) - min(df[,col]))/(bins + 1)
-      p = ggplot(df, aes_string(col)) + 
-        geom_histogram(binwidth = bw, aes(y=..density..), alpha = 0.5) +
-        geom_density(aes(y=..density..), color = 'blue') + 
-        geom_rug()
-      print(p)
-    }
+plot_scatter_sp_sz(auto_prices, numcols, alpha = 0.1)
+  
+# * 6.3 Color in Scatter Plots ================
+# Works with categorical variables
+plot_scatter_sp_sz_cl = function(df, cols, col_y = 'price', alpha = 1.0){
+  options(repr.plot.width=5, repr.plot.height=3.5) # Set the initial plot area dimensions
+  df$curb.weight.2 = df$curb.weight**2
+  for(col in cols){
+    print(paste0("Categorical variable: ",col))
+    p = ggplot(df, aes_string(col, col_y)) + 
+      geom_point(aes(shape = factor(fuel.type), size = curb.weight.2, color = aspiration), 
+                 alpha = alpha) +
+      ggtitle(paste('Scatter plot of', col_y, 'vs.', col, 
+                    '\n with shape by fuel type',
+                    '\n and color by aspiration'))
+    print(p)
   }
 }
 
-plot_hist_dens(auto_prices, numcols)  
+plot_scatter_sp_sz_cl(auto_prices, numcols, alpha = 0.3)
+
+# * 6.4 Color in Violin Plots ================
+# violin plots with color set by aspiration type. 
+
+cat_cols = c('fuel.type', 'aspiration', 'num.of.doors', 'body.style', 
+             'drive.wheels', 'engine.location', 'engine.type', 'num.of.cylinders')
+
+plot_violin <- function(df, cols, col_y = 'price', bins = 30){
+  options(repr.plot.width=5, repr.plot.height=3.5) # Set the initial plot area dimensions
+  for(col in cols){
+      print(paste0("Categorical variable: ",col))
+      p = ggplot(df, aes_string(col, col_y)) + 
+      geom_violin(aes(fill = factor(aspiration))) +
+      ggtitle(paste('Violin plot of', col, 'vs.', col_y, 
+                    '\n with fill by aspiration'))
+    print(p)
+  }
+}
+
+plot_violin(auto_prices, cat_cols) 
+ 

@@ -1,7 +1,7 @@
 #########################################################.
 # DATA EXPLORATORY
-# DISTRIBUTION OF NUMERICAL FEATURES AND LABELS
-# HISTOGRAMS. KDE PLOTS
+# VISUALIZATION RELATIONSHIP BETWEEN NUMERICAL LABEL FEATURES
+# TWO DIMENSIONAL PLOTS
 # INTRODUCTION TO MACHINE LEARNING - 2017
 # data: Automobile price 
 #########################################################.
@@ -89,73 +89,71 @@ for(col in colnames(auto_prices)){
 ###########################################################.
 # 5 VISUALIZATION  ------
 
-# * 5.1 BAR PLOTS - FREQUENCY CHARTS ------
-
-# The bar plot is created using the ggpot2 geom_bar plot type.
-plot_bars <- function(df){
-  # Set the initial plot area dimensions
-  options(repr.plot.width=4, repr.plot.height=3.5) 
-  for(col in colnames(df)){
-      # A filter is applied to find character columns.
-      if(is.character(df[,col])){
-        print(paste0("Bar Plots: ",col))
-      p = ggplot(df, aes_string(col)) + 
-        geom_bar(alpha = 0.6) 
-        theme(axis.text.x = element_text(angle = 120, hjust = 1))
-      print(p)
-    }
-  }
-}
-plot_bars(auto_prices)
-
-# * 5.2 HISTOGRAMS -------
-plot_hist <- function(df, numcols, bins = 10){
-  options(repr.plot.width=4, repr.plot.height=3) # Set the initial plot area dimensions
-  for(col in numcols){
-    if(is.numeric(df[,col])){
-      print(paste0("Histogram: ",col))
-      bw = (max(df[,col]) - min(df[,col]))/(bins + 1)
-      p = ggplot(df, aes_string(col)) + 
-        geom_histogram(alpha = 0.6, binwidth = bw) 
-      print(p)
-    }
+# * 5.5 TWO DIMENSIONAL PLOTS --------
+# Create scatter plots Feature vs Label (Price)
+plot_scatter <- function(df, cols, col_y = 'price'){
+  options(repr.plot.width=4, repr.plot.height=3.5) # Set the initial plot area dimensions
+  for(col in cols){
+    print(paste0("Numerical col: ",col))
+    p = ggplot(df, aes_string(col, col_y)) + 
+      geom_point() +
+      ggtitle(paste('Scatter plot of', col_y, 'vs.', col))
+    print(p)
   }
 }
 
-numcols = c('curb.weight', 'engine.size', 'horsepower', 'city.mpg', 'price')
-plot_hist(auto_prices, numcols)
+numcols = c('curb.weight', 'engine.size', 'horsepower', 'city.mpg')
+plot_scatter(auto_prices, numcols)
 
-# * 5.3 KERNEL DENSITY PLOTS -------
-# smoothed version of a histogram
-plot_dist <- function(df, numcols){
-  options(repr.plot.width=4, repr.plot.height=3) # Set the initial plot area dimensions
-  for(col in numcols){
-    if(is.numeric(df[,col])){
-      print(paste0("Kernel Density plot: ",col))
-      p = ggplot(df, aes_string(col)) + 
-        geom_density(color = 'blue') +
-        geom_rug()
-      print(p)
-    }
+# It seems likely that horsepower and engine size are collinear.
+# To test this hypothesis execute the code
+# in the cell below and examine the result.
+plot_scatter(auto_prices, c('horsepower'), 'engine.size') 
+# Indeed these features do appear linearly dependent.
+# Therefore, you will NOT want to use them 
+# in the same machine learning model. 
+
+# * 5.6 Using ALPHA for Transparency -----------
+# Dealing with Overplotting
+plot_scatter_t <- function(df, cols, col_y = 'price', alpha = 1.0){
+  options(repr.plot.width=4, repr.plot.height=3.5) # Set the initial plot area dimensions
+  for(col in cols){
+    print(paste0("Numerical col: ",col))
+    p = ggplot(df, aes_string(col, col_y)) + 
+      geom_point(alpha = alpha) +
+      ggtitle(paste('Scatter plot of', col_y, 'vs.', col))
+    print(p)
   }
 }
 
-plot_dist(auto_prices, numcols)
+plot_scatter_t(auto_prices, numcols, alpha = 0.2)
 
-# * 5.4 COMBINE HISTOGRAMS AND KDES -----
-plot_hist_dens <- function(df, numcols, bins = 10){
-  options(repr.plot.width=4, repr.plot.height=3) # Set the initial plot area dimensions
-  for(col in numcols){
-    if(is.numeric(df[,col])){
-      print(paste0("Hist + KDE:  plot: ",col))
-      bw = (max(df[,col]) - min(df[,col]))/(bins + 1)
-      p = ggplot(df, aes_string(col)) + 
-        geom_histogram(binwidth = bw, aes(y=..density..), alpha = 0.5) +
-        geom_density(aes(y=..density..), color = 'blue') + 
-        geom_rug()
-      print(p)
-    }
+# * 5.7 CONTOUR 2-D DENSITY PLOT ======
+plot_2density <- function(df, cols, col_y = 'price', alpha = 1.0){
+  options(repr.plot.width=4, repr.plot.height=3.5) # Set the initial plot area dimensions
+  for(col in cols){
+    print(paste0("Numerical col: ",col))
+    p = ggplot(df, aes_string(col, col_y)) + 
+      geom_density_2d() +
+      geom_point(alpha = alpha) +
+      ggtitle(paste('2-D density plot of', col_y, 'vs.', col))
+    print(p)
   }
 }
 
-plot_hist_dens(auto_prices, numcols)  
+plot_2density(auto_prices, numcols, alpha = 0.2)
+
+# * 5.8 HEXBIN PLOT ==========
+plot_hex = function(df, cols, col_y = 'price', bins = 30){
+  options(repr.plot.width=4, repr.plot.height=3.5) # Set the initial plot area dimensions
+  for(col in cols){
+    print(paste0("Numerical col: ",col))
+    p = ggplot(df, aes_string(col, col_y)) + 
+      geom_hex(show.legend = TRUE, bins = bins) +
+      ggtitle(paste('2-D hexbin plot of', col_y, 'vs.', col))
+    print(p)
+  }
+}
+
+plot_hex(auto_prices, numcols, bins = 10)
+

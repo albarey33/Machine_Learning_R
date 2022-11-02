@@ -1,9 +1,6 @@
 #########################################################.
-# DATA EXPLORATORY
-# DISTRIBUTION OF NUMERICAL FEATURES AND LABELS
-# HISTOGRAMS. KDE PLOTS
-# INTRODUCTION TO MACHINE LEARNING - 2017
-# data: Automobile price 
+# DATA EXPLORATORY - FOR NUMERICAL FEATURES AND LABELS
+# Automobile price data - 
 #########################################################.
 
 rm(list=ls()) # Delete all objects
@@ -86,76 +83,53 @@ for(col in colnames(auto_prices)){
   }    
 }
 
-###########################################################.
-# 5 VISUALIZATION  ------
+#####################################################.
+# 7 MULTI-AXIS VIEWS OF DATA  -------------
 
-# * 5.1 BAR PLOTS - FREQUENCY CHARTS ------
-
-# The bar plot is created using the ggpot2 geom_bar plot type.
-plot_bars <- function(df){
-  # Set the initial plot area dimensions
-  options(repr.plot.width=4, repr.plot.height=3.5) 
-  for(col in colnames(df)){
-      # A filter is applied to find character columns.
-      if(is.character(df[,col])){
-        print(paste0("Bar Plots: ",col))
-      p = ggplot(df, aes_string(col)) + 
-        geom_bar(alpha = 0.6) 
-        theme(axis.text.x = element_text(angle = 120, hjust = 1))
-      print(p)
-    }
-  }
-}
-plot_bars(auto_prices)
-
-# * 5.2 HISTOGRAMS -------
-plot_hist <- function(df, numcols, bins = 10){
-  options(repr.plot.width=4, repr.plot.height=3) # Set the initial plot area dimensions
-  for(col in numcols){
-    if(is.numeric(df[,col])){
-      print(paste0("Histogram: ",col))
-      bw = (max(df[,col]) - min(df[,col]))/(bins + 1)
-      p = ggplot(df, aes_string(col)) + 
-        geom_histogram(alpha = 0.6, binwidth = bw) 
-      print(p)
-    }
-  }
-}
-
+# * 7.1 Pair-wise scatter plots or scatter plot matrices ===========
 numcols = c('curb.weight', 'engine.size', 'horsepower', 'city.mpg', 'price')
-plot_hist(auto_prices, numcols)
+options(repr.plot.width=6, repr.plot.height=6) # Set the initial plot area dimensions
+ggpairs(auto_prices,
+        columns = numcols,
+        aes(color = fuel.type, alpha = 0.1),
+        lower = list(continuous = 'points'),
+        upper = list(continuous = ggally_density))
 
-# * 5.3 KERNEL DENSITY PLOTS -------
-# smoothed version of a histogram
-plot_dist <- function(df, numcols){
-  options(repr.plot.width=4, repr.plot.height=3) # Set the initial plot area dimensions
+
+# * 7.2 Conditioned Plots =============
+plot_hist_grid = function(df, numcols, bins = 10){
+  options(repr.plot.width=6, repr.plot.height=3) # Set the initial plot area dimensions
   for(col in numcols){
     if(is.numeric(df[,col])){
-      print(paste0("Kernel Density plot: ",col))
-      p = ggplot(df, aes_string(col)) + 
-        geom_density(color = 'blue') +
-        geom_rug()
-      print(p)
-    }
-  }
-}
-
-plot_dist(auto_prices, numcols)
-
-# * 5.4 COMBINE HISTOGRAMS AND KDES -----
-plot_hist_dens <- function(df, numcols, bins = 10){
-  options(repr.plot.width=4, repr.plot.height=3) # Set the initial plot area dimensions
-  for(col in numcols){
-    if(is.numeric(df[,col])){
-      print(paste0("Hist + KDE:  plot: ",col))
       bw = (max(df[,col]) - min(df[,col]))/(bins + 1)
+      print(paste0("Numerical col: ",col))
       p = ggplot(df, aes_string(col)) + 
         geom_histogram(binwidth = bw, aes(y=..density..), alpha = 0.5) +
         geom_density(aes(y=..density..), color = 'blue') + 
-        geom_rug()
+        geom_rug() +
+        facet_grid(. ~ drive.wheels)
       print(p)
     }
   }
 }
 
-plot_hist_dens(auto_prices, numcols)  
+plot_hist_grid(auto_prices, numcols)  
+
+# * 7.3 conditioned scatter plots =============
+plot_scatter_grid = function(df, cols, col_y = 'price', alpha = 1.0){
+  options(repr.plot.width=7, repr.plot.height=5) # Set the initial plot area dimensions
+  for(col in cols){
+    print(paste0("Numerical col: ",col))
+    p = ggplot(df, aes_string(col, col_y)) + 
+      geom_point(aes(color = fuel.type), alpha = alpha) +
+      ggtitle(paste('Scatter plot of', col_y, 'vs.', col, 
+                    '\n conditioned on drive wheels and body style',
+                    '\n with color by fuel type')) +
+      facet_grid(drive.wheels ~ body.style)
+    print(p)
+  }
+}
+
+numcols = c('curb.weight', 'engine.size', 'horsepower', 'city.mpg')
+plot_scatter_grid(auto_prices, numcols, alpha = 0.2)
+
