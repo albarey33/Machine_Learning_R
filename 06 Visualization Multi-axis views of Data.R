@@ -1,6 +1,9 @@
 #########################################################.
-# DATA EXPLORATORY - FOR NUMERICAL FEATURES AND LABELS
-# Automobile price data - 
+# DATA EXPLORATORY - VISUALIZATION 
+# MULTIPLE AXIS - PLOT OF SUBSETS OF DATA THAT WE CAN COMPARE
+# FACETING - METHOD OF SMALL MULTIPLES - CONDITIONING
+# PRINCIPLES OF MACHINE LEARNING - 2017
+# data: Automobile price 
 #########################################################.
 
 rm(list=ls()) # Delete all objects
@@ -91,12 +94,12 @@ numcols = c('curb.weight', 'engine.size', 'horsepower', 'city.mpg', 'price')
 options(repr.plot.width=6, repr.plot.height=6) # Set the initial plot area dimensions
 ggpairs(auto_prices,
         columns = numcols,
-        aes(color = fuel.type, alpha = 0.1),
-        lower = list(continuous = 'points'),
-        upper = list(continuous = ggally_density))
+        aes(color = fuel.type, alpha = 0.1),   # High transparency
+        lower = list(continuous = 'points'),    # Lower part: Scatter plot
+        upper = list(continuous = ggally_density))  # Higher part: Contour plot
 
 
-# * 7.2 Conditioned Plots =============
+# * 7.2 Conditioned Plots (faceted) =============
 plot_hist_grid = function(df, numcols, bins = 10){
   options(repr.plot.width=6, repr.plot.height=3) # Set the initial plot area dimensions
   for(col in numcols){
@@ -133,3 +136,6 @@ plot_scatter_grid = function(df, cols, col_y = 'price', alpha = 1.0){
 numcols = c('curb.weight', 'engine.size', 'horsepower', 'city.mpg')
 plot_scatter_grid(auto_prices, numcols, alpha = 0.2)
 
+# It generates a grid of graphs with the same dimention.
+
+# END
