@@ -3,7 +3,7 @@
 # CLASSIFICATION PROBLEM: CREDIT BAD OR GOOD
 # VISUALIZATION RELATIONSHIP BETWEEN VARIABLES AND CATEGORICAL LABEL
 # INTRODUCTION TO MACHINE LEARNING - 2017
-# data: German Credit
+# data: German Credit - Classification Problem
 #########################################################.
 
 rm(list=ls()) # Delete all objects
@@ -23,7 +23,7 @@ options(header=T, sep=",", stringsAsFactors = FALSE,
         readr.show_progress=FALSE, 
         repr.plot.width=4, repr.plot.height=4) # Set the initial plot area dimensions
 
-##################################################################.
+#################################################################.
 # 1 LOAD DATA GERMAN CREDIT -----
 
 credit_df <- read.csv("Data_Files//German_Credit.csv", header = FALSE)
@@ -204,5 +204,5 @@ plot_bars_fx = function(df, catcols){
 plot_bars_fx(credit_df, cat_cols)     # Check for proportions
 
 
-######## END ===========================
+######### END ===========================
 
