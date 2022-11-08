@@ -204,5 +204,26 @@ plot_bars_fx = function(df, catcols){
 plot_bars_fx(credit_df, cat_cols)     # Check for proportions
 
 
-######### END ===========================
 
+
+
+############################################################.
+# 5 EXAMPLE DUMMY VARIABLES ===============================
+
+# * 5.1 One categorical feature =====
+
+table(credit_df$checking_account_status)
+dummies <- dummyVars(bad_credit ~ checking_account_status, data = credit_df)
+credit_dummies <- data.frame(predict(dummies, newdata = credit_df))
+str(credit_dummies)
+
+# * 5.2 All categorical feature ======
+
+str(credit_df)
+dummies <- dummyVars(bad_credit ~ ., data = credit_df)
+credit_dummies <- data.frame(predict(dummies, newdata = credit_df))
+str(credit_dummies)
+
+# The numeric columns are left alone, so they are not affected
+
+######### END ===========================
